@@ -154,6 +154,7 @@ export const getPostsLimitService = async (
     // if (order) queries.order = order;
 
     const response = await Post.find(queries)
+      .sort({ createdAt: -1 })
       .skip(offset * limit)
       .limit(limit)
       .populate({
@@ -695,7 +696,7 @@ export const getReports = async (
       query.seen = false;
     }
     // Find reports with pagination and sorting, and populate Post and User references
-    const response = await Report.find({uid : uid})
+    const response = await Report.find({ uid: uid })
       // .sort(sortOrder)
       // .skip(queries.skip)
       .limit(queries.limit)
@@ -1030,8 +1031,8 @@ export const plusExpired = ({ pid, days, status, eid }) =>
       console.log(newExpiryDate)
       // Updating both Post and Expired documents simultaneously
       const [postResponse, expiredResponse] = await Promise.all([
-        Post.findOneAndUpdate({id : pid}, { expired: newExpiryDate }), // Update expiration date for the post
-        Expired.findOneAndUpdate({id : eid}, { status }), // Update status for the Expired entry
+        Post.findOneAndUpdate({ id: pid }, { expired: newExpiryDate }), // Update expiration date for the post
+        Expired.findOneAndUpdate({ id: eid }, { status }), // Update status for the Expired entry
       ]);
 
       const postUpdated = postResponse !== null;
@@ -1049,16 +1050,16 @@ export const plusExpired = ({ pid, days, status, eid }) =>
     }
   });
 
-  export const seenReport = (uid) => new Promise(async (resolve, reject) => {
-    try {
-      const response = await Report.updateMany({ uid : uid }, { seen: true });
-  
-      resolve({
-        err: response.nModified > 0 ? 0 : 1,
-        data: response.nModified > 0 ? 'Đã xóa bài đăng vi phạm' : 'Something went wrong',
-      });
-    } catch (error) {
-      reject(error);
-    }
-  });
-  
+export const seenReport = (uid) => new Promise(async (resolve, reject) => {
+  try {
+    const response = await Report.updateMany({ uid: uid }, { seen: true });
+
+    resolve({
+      err: response.nModified > 0 ? 0 : 1,
+      data: response.nModified > 0 ? 'Đã xóa bài đăng vi phạm' : 'Something went wrong',
+    });
+  } catch (error) {
+    reject(error);
+  }
+});
+

@@ -20,7 +20,6 @@ export const updateUser = async (req, res) => {
   try {
     const { id } = req.user;
     const payload = req.body;
-    if (req.file) req.body.avatar = req.file.path;
     if (!payload)
       return res.status(400).json({
         err: 1,

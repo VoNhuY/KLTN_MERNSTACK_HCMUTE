@@ -14,6 +14,7 @@ const UserSchema = new mongoose.Schema({
   avatar: String,
   resetPasswordToken: String,
   resetPasswordExpiry: Date,
+  reportTimes: Number
 }, { timestamps: true });
 
 UserSchema.pre('save', function (next) {

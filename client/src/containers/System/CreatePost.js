@@ -22,15 +22,17 @@ const CreatePost = ({ isEdit }) => {
   const [coords, setCoords] = useState({});
 
   const { dataEdit } = useSelector((state) => state.post);
+  console.log('dataa', dataEdit)
   const [payload, setPayload] = useState(() => {
     console.log(dataEdit);
     const initData = {
+      postId: dataEdit.id,
       categoryCode: dataEdit?.categoryCode || "",
       title: dataEdit?.title || "",
       priceNumber: dataEdit?.priceNumber * 1000000 || 0,
       areaNumber: dataEdit?.areaNumber || 0,
-      images: dataEdit?.images?.image
-        ? JSON.parse(dataEdit?.images?.image)
+      imagesId: dataEdit?.imagesId?.image
+        ? dataEdit?.imagesId?.image
         : "",
       address: dataEdit?.address || "",
       priceCode: dataEdit?.priceCode || "",
@@ -130,7 +132,6 @@ const CreatePost = ({ isEdit }) => {
     let priceCode = priceCodeArr[0]?.code;
     let areaCodeArr = getCodesArea(+payload.areaNumber, areas, 0, 90);
     let areaCode = areaCodeArr[0]?.code;
-
     let finalPayload = {
       ...payload,
       priceCode,
@@ -142,11 +143,10 @@ const CreatePost = ({ isEdit }) => {
         categories?.find((item) => item.code === payload?.categoryCode)?.value
       } ${payload?.address?.split(",")[0]}`,
     };
-    // console.log(finalPayload);
     const result = validate(finalPayload, setInvalidFields);
     if (result === 0) {
       if (dataEdit && isEdit) {
-        finalPayload.postId = dataEdit?.id;
+        finalPayload.id = dataEdit?.id;
         finalPayload.attributesId = dataEdit?.attributesId;
         finalPayload.images = dataEdit?.imagesId;
         finalPayload.overviewId = dataEdit?.overviewId;

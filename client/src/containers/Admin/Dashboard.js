@@ -17,7 +17,7 @@ const Dashboard = () => {
     const fetchDashboard = async (params) => {
         const response = await Promise.all([apiGetDashboard(params), apiGetPostsLimit({ limitPost: 5, order: ['createdAt', 'DESC'] })])
         if (response[0].data.success) setData(response[0].data.chartData)
-        if (response[1].data.err === 0) setNewPosts(response[1].data.response.rows)
+        if (response[1].data.err === 0) setNewPosts(response[1].data.response)
     }
     useEffect(() => {
         const type = isMonth ? 'month' : 'day'
@@ -116,9 +116,9 @@ const Dashboard = () => {
                                 >
                                     <td className={`p-2 ${index % 2 === 0 ? '' : 'bg-gray-100'} m-auto`}>{index + 1}</td>
                                     <td className={`p-2 ${index % 2 === 0 ? '' : 'bg-gray-100'} m-auto`}>{item?.title}</td>
-                                    <td className={`p-2 ${index % 2 === 0 ? '' : 'bg-gray-100'} m-auto`}>{item?.category?.value}</td>
-                                    <td className={`p-2 ${index % 2 === 0 ? '' : 'bg-gray-100'} m-auto`}>{item?.receiverName || item?.user?.name}</td>
-                                    <td className={`p-2 ${index % 2 === 0 ? '' : 'bg-gray-100'} m-auto`}>{item?.receiverPhone || item?.user?.zalo}</td>
+                                    <td className={`p-2 ${index % 2 === 0 ? '' : 'bg-gray-100'} m-auto`}>{item?.categoryCode}</td>
+                                    <td className={`p-2 ${index % 2 === 0 ? '' : 'bg-gray-100'} m-auto`}>{item?.receiverName || item?.userId?.name}</td>
+                                    <td className={`p-2 ${index % 2 === 0 ? '' : 'bg-gray-100'} m-auto`}>{item?.receiverPhone || item?.userId?.zalo}</td>
                                     <td className={`p-2 ${index % 2 === 0 ? '' : 'bg-gray-100'} m-auto`}>{moment(item?.createdAt).format('DD/MM/YYYY')}</td>
                                 </tr>
                             ))}

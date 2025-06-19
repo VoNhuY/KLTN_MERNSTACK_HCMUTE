@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { InputReadOnly, InputFormV2, Button } from '../../components'
 import { useSelector, useDispatch } from 'react-redux'
-import { apiUpdateUser } from '../../services'
+import { apiUpdateUser, apiUploadImages } from '../../services'
 import { fileToBase64 } from '../../ultils/Common/tobase64'
 import { getCurrent, logout } from '../../store/actions'
 import Swal from 'sweetalert2'
@@ -10,7 +10,8 @@ import { path } from '../../ultils/constant'
 
 const EditAccount = () => {
     const { currentData } = useSelector(state => state.user)
-    const [image, setImage] = useState('')
+    const [image, setImage] = useState( currentData?.avatar ||'')
+    const [isLoading, setIsLoading] = useState(false)
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [payload, setPayload] = useState({
@@ -20,13 +21,13 @@ const EditAccount = () => {
         zalo: currentData?.zalo || ''
     })
     const handleSubmit = async () => {
-        console.log(payload);
+        // console.log(payload);
         const formData = new FormData()
-        if (payload.name) formData.append('name', payload.name)
-        if (payload.avatar) formData.append('avatar', payload.avatar)
-        if (payload.fbUrl) formData.append('fbUrl', payload.fbUrl)
-        if (payload.zalo) formData.append('zalo', payload.zalo)
-        const response = await apiUpdateUser(formData)
+        // if (payload.name) formData.append('name', payload.name)
+        // if (payload.avatar) formData.append('avatar', payload.avatar)
+        // if (payload.fbUrl) formData.append('fbUrl', payload.fbUrl)
+        // if (payload.zalo) formData.append('zalo', payload.zalo)
+        const response = await apiUpdateUser(payload)
         if (response?.data.err === 0) {
             Swal.fire('Done', 'Chỉnh sửa thông tin cá nhân thành công', 'success').then(() => {
                 dispatch(getCurrent())
@@ -36,13 +37,37 @@ const EditAccount = () => {
         }
     }
     const handleUploadFile = async (e) => {
-        const imageBase64 = await fileToBase64(e.target.files[0])
-        setImage(imageBase64)
-        setPayload(prev => ({
-            ...prev,
-            avatar: e.target.files[0]
-        }))
-    }
+        try {
+            e.stopPropagation();
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            setIsLoading(true); // nếu bạn có state này
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", process.env.REACT_APP_UPLOAD_ASSETS_NAME);
+
+            console.log("Uploading file:", file.name);
+            const response = await apiUploadImages(formData);
+            console.log("API Response:", response);
+
+            if (response.status === 200) {
+                const imageUrl = response.data?.secure_url;
+                setImage(imageUrl); // preview ảnh
+                setPayload(prev => ({
+                    ...prev,
+                    avatar: imageUrl // cập nhật link ảnh vào payload
+                }));
+            }
+        } catch (error) {
+            console.error("Upload error:", error);
+            Swal.fire("Oops!", "Không thể upload ảnh. Vui lòng thử lại.", "error");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className='flex flex-col h-full items-center'>
             <h1 className='text-3xl w-full text-start font-medium py-4 border-b border-gray-200'>Chỉnh sửa thông tin cá nhân</h1>

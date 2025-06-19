@@ -10,7 +10,9 @@ router.get('/roles', verifyToken, isAdmin, userController.getRoles)
 router.post('/forgotpassword', userController.forgotPassword)
 router.post('/resetpassword', userController.resetPassword)
 router.get('/', verifyToken, isAdmin, userController.getUsers)
-router.put('/', verifyToken, uploadFile.single('avatar'), userController.updateUser)
+router.put('/', verifyToken, userController.updateUser)
+// router.put('/', verifyToken, uploadFile.single('avatar'), userController.updateUser)
+
 router.put('/:uid', verifyToken, isAdmin, userController.updateUserByAdmin)
 router.delete('/:uid', verifyToken, isAdmin, userController.deleteUser)
 

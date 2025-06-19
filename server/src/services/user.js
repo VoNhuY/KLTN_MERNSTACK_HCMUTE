@@ -25,7 +25,7 @@ export const updateUser = (payload, id) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await User.findOneAndUpdate({ id: id }, payload, {
-        new: true,
+        new: false,
       });
       resolve({
         err: response ? 0 : 1,

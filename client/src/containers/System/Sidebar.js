@@ -24,7 +24,7 @@ const Sidebar = () => {
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <img
-            src={dumbavt}
+            src={currentData.avatar || dumbavt}
             alt="avatar"
             className="w-12 h-12 object-cover rounded-full border-2 border-white"
           />
