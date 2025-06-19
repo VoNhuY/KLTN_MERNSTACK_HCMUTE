@@ -8,7 +8,7 @@ import { apiCreatePost, apiUpdatePost } from "../../services";
 import Swal from "sweetalert2";
 import validate from "../../ultils/Common/validateFields";
 import { useDispatch } from "react-redux";
-import { resetDataEdit } from "../../store/actions";
+import { editData, resetDataEdit } from "../../store/actions";
 import { attention } from "../../ultils/constant";
 import { useDebounce } from "../../HOC/useDebounce";
 import Geocode from "react-geocode";
@@ -22,16 +22,13 @@ const CreatePost = ({ isEdit }) => {
   const [coords, setCoords] = useState({});
 
   const { dataEdit } = useSelector((state) => state.post);
-  console.log('dataa', dataEdit)
   const [payload, setPayload] = useState(() => {
-    console.log(dataEdit);
     const initData = {
-      postId: dataEdit.id,
       categoryCode: dataEdit?.categoryCode || "",
       title: dataEdit?.title || "",
       priceNumber: dataEdit?.priceNumber * 1000000 || 0,
       areaNumber: dataEdit?.areaNumber || 0,
-      imagesId: dataEdit?.imagesId?.image
+      images: dataEdit?.imagesId?.image
         ? dataEdit?.imagesId?.image
         : "",
       address: dataEdit?.address || "",
@@ -60,7 +57,7 @@ const CreatePost = ({ isEdit }) => {
   //   }, []);
   useEffect(() => {
     if (dataEdit) {
-      let images = dataEdit?.images?.image;
+      let images = dataEdit?.imagesId?.image;
       images && setImagesPreview(images);
     }
   }, [dataEdit]);
@@ -84,7 +81,7 @@ const CreatePost = ({ isEdit }) => {
     try {
       e.stopPropagation();
       setIsLoading(true);
-      let images = [];
+      let imagesId = [];
       let files = e.target.files;
       let formData = new FormData();
       for (let i of files) {
@@ -97,12 +94,12 @@ const CreatePost = ({ isEdit }) => {
         let response = await apiUploadImages(formData);
         console.log("API Response:", response);
         if (response.status === 200)
-          images = [...images, response.data?.secure_url];
+          imagesId = [...imagesId, response.data?.secure_url];
       }
-      setImagesPreview((prev) => [...prev, ...images]);
+      setImagesPreview((prev) => [...prev, ...imagesId]);
       setPayload((prev) => ({
         ...prev,
-        images: [...(prev.images || []), ...images],
+        images: [...(prev.images || []), ...imagesId],
       }));
     } catch (error) {
       console.error("Error uploading files:", error);
@@ -131,7 +128,8 @@ const CreatePost = ({ isEdit }) => {
     );
     let priceCode = priceCodeArr[0]?.code;
     let areaCodeArr = getCodesArea(+payload.areaNumber, areas, 0, 90);
-    let areaCode = areaCodeArr[0]?.code;
+    let areaCode = areaCodeArr[0]?.code || '2UMD';
+    console.log('payload', payload)
     let finalPayload = {
       ...payload,
       priceCode,
@@ -139,16 +137,21 @@ const CreatePost = ({ isEdit }) => {
       userId: currentData.id,
       priceNumber: +payload.priceNumber / Math.pow(10, 6),
       target: payload.target || "Tất cả",
-      label: `${
-        categories?.find((item) => item.code === payload?.categoryCode)?.value
-      } ${payload?.address?.split(",")[0]}`,
+      label: `${categories?.find((item) => item.code === payload?.categoryCode)?.value
+        } ${payload?.address?.split(",")[0]}`,
     };
+    console.log(dataEdit)
+    console.log(finalPayload)
+    if (dataEdit) {
+      finalPayload = { ...finalPayload, postId: dataEdit?.id }
+    }
     const result = validate(finalPayload, setInvalidFields);
+
     if (result === 0) {
       if (dataEdit && isEdit) {
         finalPayload.id = dataEdit?.id;
         finalPayload.attributesId = dataEdit?.attributesId;
-        finalPayload.images = dataEdit?.imagesId;
+        finalPayload.imagesId = dataEdit?.imagesId;
         finalPayload.overviewId = dataEdit?.overviewId;
 
         const response = await apiUpdatePost(finalPayload);
@@ -219,7 +222,7 @@ const CreatePost = ({ isEdit }) => {
             setPayload={setPayload}
           />
           {!isEdit && (
-            <div className="w-full mb-6">
+            <div div className="w-full mb-6">
               <h2 className="font-semibold text-xl py-4">Hình ảnh</h2>
               <small>Cập nhật hình ảnh rõ ràng sẽ cho thuê nhanh hơn</small>
               <div className="w-full">
@@ -300,7 +303,7 @@ const CreatePost = ({ isEdit }) => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

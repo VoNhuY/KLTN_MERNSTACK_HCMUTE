@@ -102,7 +102,7 @@ const Modal = ({ setIsShowModal, content, name, handleSubmit, queries, arrMinMax
                         <GrLinkPrevious size={24} />
                     </span>
                 </div>
-                {(name === 'category' || name === 'province') && <div className='p-4 flex flex-col'>
+                {(name === 'category' || name === 'province') && <div className='p-4 flex flex-col max-h-[90%] overflow-y-scroll'>
                     <span className='py-2 flex gap-2 items-center border-b border-gray-200'>
                         <input
                             type="radio"

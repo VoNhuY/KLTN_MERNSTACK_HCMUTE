@@ -612,7 +612,7 @@ export const addToWishlist = async (userId, postId) => {
 
     return {
       err: 0,
-      msg: "Post added to wishlist.",
+      msg: "Đã thêm bằng đăng vào danh sách yêu thích",
       response: updatedWishlist,
     };
   } catch (error) {
@@ -907,7 +907,7 @@ export const updateWishlist = ({ pid, uid }) =>
           err: response.deletedCount > 0 ? 0 : 1,
           msg:
             response.deletedCount > 0
-              ? "Removed from your wishlist"
+              ? "Xóa khỏi danh sách yêu thích"
               : "Something went wrong",
         });
       } else {
@@ -916,7 +916,7 @@ export const updateWishlist = ({ pid, uid }) =>
 
         resolve({
           err: response ? 0 : 1,
-          msg: response ? "Added to your wishlist" : "Something went wrong",
+          msg: response ? "Đã thêm vào danh sách yêu thích" : "Something went wrong",
         });
       }
     } catch (error) {
